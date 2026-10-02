@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "intent-router-hybrid.fullname" . }}
+  labels:
+    {{- include "intent-router-hybrid.labels" . | nindent 4 }}
+data:
+  SYSTEM1_BACKEND: {{ .Values.config.system1Backend | quote }}
+  SYSTEM2_BACKEND: {{ .Values.config.system2Backend | quote }}
+  GEMMA_MODEL: {{ .Values.config.gemmaModel | quote }}
+  OLLAMA_URL: {{ .Values.config.ollamaUrl | quote }}
+  TYPESAFE_MODEL: {{ .Values.config.jevModel | quote }}
+  TYPESAFE_API_URL: {{ .Values.config.jevApiUrl | quote }}
+  TYPESAFE_TIMEOUT_S: {{ .Values.config.jevTimeoutS | quote }}
+  CONFIDENCE_THRESHOLD: {{ .Values.config.confidenceThreshold | quote }}
+  HUMAN_REVIEW_THRESHOLD: {{ .Values.config.humanReviewThreshold | quote }}
+  GUARDRAIL_REVIEW_SCORE: {{ .Values.config.guardrailReviewScore | quote }}
+  GUARDRAIL_BLOCK_SCORE: {{ .Values.config.guardrailBlockScore | quote }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  WORKER_AGENTS_JSON: {{ .Values.config.workerAgents | toJson | quote }}

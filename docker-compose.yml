@@ -1,0 +1,34 @@
+# Local demo: hybrid router (Jev System 1 + Gemma System 2) + two stub workers.
+#   docker compose up --build
+# Router on http://localhost:8080, workers on :8001 / :8002.
+# For live backends: export TYPESAFE_API_KEY and/or set SYSTEM2_BACKEND=ollama
+# (with an Ollama server running Gemma), e.g.:
+#   TYPESAFE_API_KEY=ts_... SYSTEM1_BACKEND=jev docker compose up --build
+services:
+  router:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      SYSTEM1_BACKEND: mock   # -> jev for the live API (needs TYPESAFE_API_KEY)
+      SYSTEM2_BACKEND: mock   # -> ollama for a local Gemma reviewer
+      # TYPESAFE_API_KEY: ${TYPESAFE_API_KEY}
+      TYPESAFE_MODEL: jev-1.13.0
+      # OLLAMA_URL: http://host.docker.internal:11434
+      # GEMMA_MODEL: gemma-3-4b-it
+      WORKER_AGENTS_JSON: '{"billing_inquiry":"http://worker-a:8001","technical_support":"http://worker-a:8001","sales_question":"http://worker-a:8001","account_update":"http://worker-b:8002","order_status":"http://worker-b:8002","fallback":"http://worker-b:8002"}'
+    depends_on:
+      - worker-a
+      - worker-b
+
+  worker-a:
+    build: .
+    command: ["uvicorn", "src.workers.stub_worker:app", "--host", "0.0.0.0", "--port", "8001"]
+    environment:
+      WORKER_NAME: worker-a
+
+  worker-b:
+    build: .
+    command: ["uvicorn", "src.workers.stub_worker:app", "--host", "0.0.0.0", "--port", "8002"]
+    environment:
+      WORKER_NAME: worker-b
